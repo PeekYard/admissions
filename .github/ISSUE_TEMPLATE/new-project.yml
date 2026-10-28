@@ -14,16 +14,8 @@ body:
     id: project-name
     attributes:
       label: Nome do projeto
-      description: Nome público que aparecerá na vitrine.
+      description: "Nome público que aparecerá na vitrine; o subdomínio será gerado automaticamente removendo espaços, acentos e símbolos (ex.: Nome do Projeto → nomedoprojeto.peekyard.com)."
       placeholder: "Ex.: Aurora"
-    validations:
-      required: true
-  - type: input
-    id: slug
-    attributes:
-      label: Endereço desejado
-      description: "Apenas letras minúsculas, números e hífens (ex.: projeto-aurora)."
-      placeholder: "projeto-aurora"
     validations:
       required: true
   - type: textarea

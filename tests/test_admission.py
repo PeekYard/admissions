@@ -14,7 +14,7 @@ class FormTests(unittest.TestCase):
     def setUp(self):
         self.user = {"login": "creator-alpha", "id": 1234}
         self.form = {
-            "name": "Projeto Aurora", "slug": "aurora",
+            "name": "Projeto Aurora",
             "story": "Uma história detalhada sobre um projeto independente que resolve problemas reais e tem visão de futuro. Este texto tem tamanho suficiente.",
             "audience": "Criadores independentes e pequenas empresas de tecnologia.",
             "repo": "https://github.com/creator-alpha/aurora",
@@ -26,8 +26,30 @@ class FormTests(unittest.TestCase):
         self.assertEqual(admission.validate_form(self.form, self.user), [])
 
     def test_bad_slug_and_owner(self):
-        data = dict(self.form, slug="admin", repo="https://github.com/other/repo")
+        data = dict(self.form, name="Admin", repo="https://github.com/other/repo")
         self.assertEqual(len(admission.validate_form(data, self.user)), 2)
+
+    def test_canonical_hostname(self):
+        cases = {
+            "Nome do Projeto": "nomedoprojeto",
+            "Café & Código": "cafecodigo",
+            "Minha Startup 2.0": "minhastartup20",
+            "Saúde+": "saude",
+            "Crème Brûlée": "cremebrulee",
+            "Weiß & Æther": "weissaether",
+        }
+        for name, expected in cases.items():
+            with self.subTest(name=name):
+                self.assertEqual(admission.canonical_slug(name), expected)
+
+    def test_reserved_invalid_and_overlong_names(self):
+        for name in ("Admin", "!!!", "日本語", "a" * 51):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                admission.canonical_slug(name)
+
+    def test_canonical_collisions(self):
+        self.assertEqual(admission.canonical_slug("Minha Ideia"),
+                         admission.canonical_slug("Minha-Ideia"))
 
     def test_strict_repo_urls(self):
         for url in ("https://evil.com/o/r", "https://github.com/o/r/tree/main",

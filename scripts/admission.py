@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -23,7 +24,6 @@ MARKER = "<!-- peekyard:admission-intake -->"
 AI_MARKER = "<!-- peekyard:admission-ai -->"
 FIELDS = {
     "name": "Nome do projeto",
-    "slug": "Endereço desejado",
     "story": "Descrição e história",
     "audience": "Público-alvo e proposta de valor",
     "repo": "URL do repositório GitHub",
@@ -32,7 +32,7 @@ FIELDS = {
     "declarations": "Declarações",
 }
 RESERVED = {
-    "admin", "api", "assets", "admissions", "login", "logout", "signin",
+    "admin", "api", "assets", "admissions", "operations", "login", "logout", "signin",
     "signup", "support", "security", "static", "www", "github", "help",
     "about", "robots", "favicon", "projects", "terms", "privacy",
     "sitemap", "settings", "dashboard", "contact",
@@ -110,13 +110,25 @@ def get_gh_repo_url(raw):
     return owner, name
 
 
+def canonical_slug(name):
+    """Gera hostname de projeto: ASCII minúsculo, apenas letras e números."""
+    replacements = {"ß": "ss", "æ": "ae", "œ": "oe", "ø": "o", "ł": "l", "đ": "d", "þ": "th"}
+    text = "".join(replacements.get(char, char) for char in name.lower())
+    text = unicodedata.normalize("NFKD", text)
+    slug = "".join(ch for ch in text if ch.isascii() and ch.isalnum())
+    if not 1 <= len(slug) <= 50 or slug in RESERVED or slug.startswith("xn--"):
+        raise ValueError("Nome gera um subdomínio inválido/reservado (máximo 50 caracteres alfanuméricos).")
+    return slug
+
+
 def validate_form(data, user):
     errors = []
     if not (3 <= len(data["name"].strip()) <= 90):
         errors.append("O nome deve ter entre 3 e 90 caracteres.")
-    slug = data["slug"].strip()
-    if len(slug) > 50 or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug) or slug in RESERVED:
-        errors.append("Slug inválido ou reservado: até 50 caracteres a-z, 0-9 ou hífens.")
+    try:
+        canonical_slug(data["name"].strip())
+    except ValueError as exc:
+        errors.append(str(exc))
     if len(data["story"].strip()) < 100:
         errors.append("A história precisa de pelo menos 100 caracteres.")
     if len(data["audience"].strip()) < 30:

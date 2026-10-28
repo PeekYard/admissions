@@ -24,6 +24,12 @@ Este repositório público recebe pedidos para exibir landing pages na vitrine [
 5. Para repetir a análise, remova o rótulo e aplique-o novamente.
 6. A API recebe amostras limitadas de código-fonte público, políticas e dados de formulário. Ela pode falhar, alucinar e sofrer tentativas de prompt injection. A revisão humana é obrigatória.
 
+## Nomes e endereços
+
+O hostname é gerado automaticamente de **Nome do projeto**: remove espaços, acentos e pontuação, conserva apenas letras ASCII minúsculas e números, e usa `nome.peekyard.com`. Exemplo: `Nome do Projeto` → `nomedoprojeto.peekyard.com`. Nomes vazios após a normalização, reservados, acima de 50 caracteres ou em colisão são bloqueados. Não existe campo para escolher o subdomínio manualmente.
+
+Projetos que já foram provisionados mantêm seus endereços anteriores; nenhuma migração é feita automaticamente.
+
 ## Segurança
 
 - A triagem lê dados públicos pela API GitHub, com limites de tamanho e número de arquivos. **Não clona, instala pacotes nem executa código de terceiros**.
@@ -31,7 +37,7 @@ Este repositório público recebe pedidos para exibir landing pages na vitrine [
 - É registrado um commit SHA para orientar revisões futuras. O código pode mudar depois do relatório; antes de publicar, será obrigatória uma nova verificação do SHA aprovado.
 - Os workflows que recebem Issues públicos usam somente permissões limitadas (contents: read e issues: write) e **nenhum token de provisionamento**.
 - Arquivos de governança de projetos, scripts externos, CDNs e uso de storage da origem são sinalizados para análise aprofundada.
-- Como os projetos em peekyard.com/caminho compartilham a mesma origem, **JavaScript arbitrário não pode ser considerado isolado somente pela revisão estática ou por IA**. Precisaremos definir isolamento de origem na etapa de publicação.
+- Os projetos serão publicados em subdomínios independentes de peekyard.com; a política de cookies e o uso de recursos externos ainda requerem revisão.
 - O GitHub Issues é público: não publicar senhas, dados pessoais sensíveis ou informações sigilosas.
 - Não habilitar ações de publicação ou gestão de acessos neste repositório durante a Entrega 1.
 
