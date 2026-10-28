@@ -1,0 +1,77 @@
+name: "Divulgar um projeto"
+description: "Solicite a admissão de uma landing page independente na Peekyard."
+title: "[Projeto] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por querer fazer parte da Peekyard! Este formulário e seus dados serão **públicos**.
+        Não informe telefone pessoal, endereço residencial, senhas, tokens ou informações confidenciais.
+        Use um repositório GitHub **público e sob sua titularidade**, contendo `index.html` na raiz.
+        Nada será publicado antes de uma decisão do administrador.
+  - type: input
+    id: project-name
+    attributes:
+      label: Nome do projeto
+      description: Nome público que aparecerá na vitrine.
+      placeholder: "Ex.: Aurora"
+    validations:
+      required: true
+  - type: input
+    id: slug
+    attributes:
+      label: Endereço desejado
+      description: "Apenas letras minúsculas, números e hífens (ex.: projeto-aurora)."
+      placeholder: "projeto-aurora"
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: Descrição e história
+      description: "Conte como surgiu, qual problema resolve e o estágio atual. Pelo menos 100 caracteres."
+      placeholder: "Nosso projeto nasceu quando..."
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Público-alvo e proposta de valor
+      description: "Para quem é o projeto? O que a pessoa encontrará na página?"
+    validations:
+      required: true
+  - type: input
+    id: repo
+    attributes:
+      label: URL do repositório GitHub
+      description: "Ex.: https://github.com/seu-usuario/seu-projeto — deve ser público e pertencer à sua conta."
+    validations:
+      required: true
+  - type: input
+    id: contact
+    attributes:
+      label: Como entrar em contato
+      description: "Informe apenas um canal de contato público ou comercial; evite dados pessoais."
+      placeholder: "https://example.com/contato ou contato@empresa.com"
+    validations:
+      required: true
+  - type: textarea
+    id: externals
+    attributes:
+      label: Dependências e serviços externos
+      description: "Liste CDNs, fontes, vídeos, analytics, formulários, JS de terceiros e APIs. Se não houver, escreva 'Nenhum'."
+      placeholder: "Google Fonts (fontes), ..."
+    validations:
+      required: true
+  - type: checkboxes
+    id: declarations
+    attributes:
+      label: Declarações
+      options:
+        - label: "Declaro que tenho direito de representar o projeto e disponibilizar os arquivos enviados."
+          required: true
+        - label: "Concordo com as políticas da Peekyard e com a análise automatizada de conteúdo e código público, inclusive com uso de serviços de IA."
+          required: true
+        - label: "Entendo que a inscrição não implica aprovação nem publicação e que os dados deste Issue serão públicos."
+          required: true
