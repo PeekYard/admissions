@@ -32,7 +32,7 @@ FIELDS = {
     "declarations": "Declarações",
 }
 RESERVED = {
-    "admin", "api", "assets", "admissions", "login", "logout", "signin",
+    "admin", "api", "assets", "admissions", "operations", "login", "logout", "signin",
     "signup", "support", "security", "static", "www", "github", "help",
     "about", "robots", "favicon", "projects", "terms", "privacy",
     "sitemap", "settings", "dashboard", "contact",
