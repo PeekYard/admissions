@@ -144,6 +144,10 @@ def scan_file(path, content):
     html = Path(path).suffix.lower() in {".html", ".htm"}
     js = Path(path).suffix.lower() in {".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx"} or html
     if html:
+        if re.search(r"<link\b[^>]*\bhref\s*=\s*['\"]?(?:https?:)?//", content, re.I):
+            flag("medium", "Link para recurso externo: verificar origem e finalidade (ex.: fontes ou CSS).")
+        if re.search(r"<(?:img|video|audio|source)\b[^>]*\bsrc\s*=\s*['\"]?(?:https?:)?//", content, re.I):
+            flag("medium", "Mídia hospedada externamente: verificar origem, conteúdo e privacidade.")
         if re.search(r"<script\b[^>]*\bsrc\s*=\s*['\"]https?://", content, re.I):
             flag("high", "Script remoto: verificar origem, versão e integridade.")
         if re.search(r"<script\b(?![^>]*\bsrc\s*=)[^>]*>", content, re.I):
@@ -156,6 +160,11 @@ def scan_file(path, content):
             flag("medium", "Evento JavaScript inline detectado.")
         if re.search(r"href\s*=\s*['\"]\s*javascript:", content, re.I):
             flag("high", "Endereço javascript: detectado.")
+    if Path(path).suffix.lower() == ".css" or html:
+        if re.search(r"@import\s+(?:url\(\s*)?['\"]?\s*(?:https?:)?//", content, re.I):
+            flag("medium", "Importação CSS remota: verificar versão, origem e política de carregamento.")
+        if re.search(r"url\(\s*['\"]?(?:https?:)?//", content, re.I):
+            flag("medium", "CSS com recurso hospedado externamente.")
     if js and re.search(r"\b(?:eval\s*\(|new\s+Function\s*\(|document\.write\s*\()", content):
         flag("high", "Execução ou escrita dinâmica: revisão aprofundada.")
     if js and re.search(r"(?:document\.cookie|localStorage\.|sessionStorage\.|serviceWorker\.register)", content):
