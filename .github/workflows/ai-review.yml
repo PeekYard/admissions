@@ -1,0 +1,35 @@
+name: "Admissão · análise contextual por IA"
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: admission-ai-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    # Apenas a conta administradora pode disparar a análise paga.
+    if: >-
+      github.event.label.name == 'admission:run-ai' &&
+      github.event.sender.id == 349365411 &&
+      github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: "Obter código confiável"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: "Análise contextual do snapshot público"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+        run: python3 scripts/admission.py ai
