@@ -88,5 +88,18 @@ class ScannerTests(unittest.TestCase):
         self.assertEqual(result["findings"], [])
 
 
+class AiFailureTests(unittest.TestCase):
+    def test_api_billing_error_marks_workflow_failed_and_posts_comment(self):
+        result = {"snapshot": {"commit_sha": "a" * 40}, "errors": []}
+        with patch.object(admission, "ai_review", side_effect=admission.ApiFailure(429, "No credits remaining")):
+            with patch.object(admission, "upsert_comment") as comment:
+                with self.assertRaises(SystemExit) as raised:
+                    admission.publish_ai_result("PeekYard/admissions", 4, result)
+        self.assertIn("não concluída", str(raised.exception))
+        self.assertEqual(comment.call_count, 1)
+        self.assertIn("IA indisponível", comment.call_args.args[3])
+
+
+
 if __name__ == "__main__":
     unittest.main()

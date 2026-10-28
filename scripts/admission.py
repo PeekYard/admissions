@@ -390,6 +390,19 @@ def ai_report(result, ai):
     return "\n".join(lines)[:30_000]
 
 
+def publish_ai_result(repository, number, result):
+    """Publica diagnóstico e falha o job se a análise não foi concluída."""
+    try:
+        decision = ai_review(result)
+        message = ai_report(result, decision)
+    except (ApiFailure, ValueError, json.JSONDecodeError) as exc:
+        message = AI_MARKER + "\n## IA indisponível\n\n" + str(exc)[:350] + "\n\nRevisão humana obrigatória."
+        upsert_comment(repository, number, AI_MARKER, message)
+        raise SystemExit("Análise por IA não concluída. Consulte o comentário do Issue.") from exc
+    upsert_comment(repository, number, AI_MARKER, message)
+    print("Parecer consultivo registrado.")
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "intake"
     repo = os.environ.get("GITHUB_REPOSITORY", "")
@@ -419,13 +432,7 @@ def main():
                            "admission:needs-info" if result["errors"] else "admission:triaged")
         print("Triagem concluída; nenhuma publicação. SHA:", (result["snapshot"] or {}).get("commit_sha"))
     elif mode == "ai":
-        try:
-            decision = ai_review(result)
-            text = ai_report(result, decision)
-        except (ApiFailure, ValueError, json.JSONDecodeError) as exc:
-            text = AI_MARKER + "\n## IA indisponível\n\n" + str(exc)[:350] + "\n\nRevisão humana obrigatória."
-        upsert_comment(repo, number, AI_MARKER, text)
-        print("Parecer consultivo registrado.")
+        publish_ai_result(repo, number, result)
     else:
         raise ValueError("Modo não reconhecido.")
 
