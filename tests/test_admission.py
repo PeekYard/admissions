@@ -50,6 +50,21 @@ class ScannerTests(unittest.TestCase):
         result = admission.scan_file("index.html", '<script src="https://cdn.example.com/a.js"></script>')
         self.assertTrue(any(f["severity"] == "high" for f in result))
 
+    def test_external_google_fonts_link_is_flagged(self):
+        html = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans">'
+        results = admission.scan_file("index.html", html)
+        self.assertTrue(any("recurso externo" in f["message"] for f in results))
+
+    def test_external_media_is_flagged(self):
+        html = '<img src="https://cdn.example.org/banner.png" alt="Banner">'
+        results = admission.scan_file("index.html", html)
+        self.assertTrue(any("Mídia" in f["message"] for f in results))
+
+    def test_css_import_is_flagged(self):
+        css = '@import url("https://fonts.googleapis.com/css2?family=DM+Sans");'
+        results = admission.scan_file("style.css", css)
+        self.assertTrue(any("Importação CSS" in f["message"] for f in results))
+
     def test_storage_is_flagged(self):
         result = admission.scan_file("app.js", "localStorage.setItem('x','y')")
         self.assertTrue(any("origem" in f["message"] for f in result))
