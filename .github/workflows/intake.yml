@@ -1,4 +1,4 @@
-name: "Admissão · triagem técnica"
+name: "01 · Admissão | Validar inscrição"
 on:
   issues:
     types: [opened]

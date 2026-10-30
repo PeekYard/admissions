@@ -1,4 +1,4 @@
-name: "Admissão · análise contextual por IA"
+name: "02 · Admissão | Parecer contextual"
 on:
   issues:
     types: [labeled]
