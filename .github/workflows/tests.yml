@@ -1,4 +1,4 @@
-name: "Admissão · testes do módulo"
+name: "28 · CI | Validar admissions"
 on:
   pull_request:
     branches: [main]
